@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+colorpicker in HTML 5 canvas and javascript (no jquery)
+</title>
+<style>
+/*force IE to not scroll the page to be able to change the handles on a touch device*/
+canvas{
+	-ms-touch-action: none;   
+}
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+</head>
+<body>
+<h1>
+html5-colorPicker
+================
+</h1><p>
+<br />
+
+</p>
+<a href="jeroen.vanoorschot.biz">Jeroen van Oorschot</a><br /><a href="https://github.com/JeroenvO/html5-colorpicker">github code</a>
+<a href="https://github.com/JeroenvO/html5-timepicker">Also view my html5 canvas timepicker/clock</a>
+<script type="text/javascript" src="colorPicker.js">
+</script>
+<div>
+<!-- don't forget this part -->
+<!-- Definition of the canvas objects-->
+<canvas width="500" height="500" id="colorPicker1"></canvas>
+
+</div>
+
+<!--an example division to show the color of the colorpicker -->
+<span id='colorPickerValue'></span>
+
+
+
+<script>
+/*
+## options ##
+* h		 	 -> initial color hue
+* s		 	 -> initial color saturation
+* v  	 	 -> initial color value
+* image		 -> the image to use for the background. Default is color-500.png
+* centerX, centerY -> define a custom center position for the colorpicker. The center of the canvas is default
+* drawInterval	   -> number of milliseconds between drawing. default is 10ms = 100hz. The real speed depends on the browser and computer.
+* scale			 -> set the scale of the colorpicker. This is the number of pixels the arc for value is thick. When not set, it adapts to the canvas size: scale = min(w,h) / 10.
+
+## functions ##
+* onColorChange 	 -> callback on dragging the handles
+* onCenterClick 	 -> callback on clicking on the center
+to set options after creating the colorpicker use these functions.
+* [name].setColorHSV(h,s,v)	->to set the color to a hsv value
+	
+to retrieve values at any moment use
+* [name].getColorHSV() to get the color in HSV
+* [name].getColorHSL() to get the color in HSL (for use in CSS colors)
+*/
+
+
+//add the colorpicker to the canvas
+colorPicker1 = new colorPicker(document.getElementById('colorPicker1'), {
+	bgcolor: 'rgba(50,50,50,0)',
+	onColorChange: function(){
+		var color = this.getColorHSV();
+		document.getElementById('colorPickerValue').innerHTML = "Color h:"+color.h+" s: "+ color.s+" v: "+ color.v;
+		},
+	onCenterClick: function(){
+		window.alert('You clicked the center!');
+		}
+});
+
+
+</script>
+<p>
+
+</p>
+
+</body>
+</html>
