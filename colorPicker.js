@@ -175,9 +175,23 @@ colorPicker.prototype.getColorHSL = function(){
 //set the colorPicker to a given color in hsv values
 colorPicker.prototype.setColorHSV = function(h, s, v){
 	this.h = h<2*Math.PI?h:0;
-	this.s = s<100?s:0;
-	this.v = v<100?v:0;
+	this.s = (s<100?s:0)/100;
+	this.v = (v<100?v:0)/100;
 	this.changed = true;
+}
+//start the timer for drawing
+colorPicker.prototype.startDraw = function(){
+	if(!this.drawID){
+		var colorPicker = this;
+		this.drawID = setInterval(function() { colorPicker.draw(); }, colorPicker.drawInterval);
+	}
+}
+//stop the timer for drawing, to save cpu
+colorPicker.prototype.stopDraw = function(){
+	if(this.drawID){
+		clearInterval(this.drawID);
+		this.drawID = false;
+	}
 }
 //function object for each canvas, for each colorPicker
 //contains all variables for a colorPicker like scale and color.
@@ -206,8 +220,11 @@ function colorPicker(canvas,opts){
 	this.setColorHSV(opts.h, opts.s, opts.v);
 	
 	//start the drawing
-	setInterval(function() { colorPicker.draw(); }, colorPicker.drawInterval);
-	
+	if((typeof opts.autoStartDraw === 'undefined')||opts.autoStartDraw==true;){
+		this.drawID = setInterval(function() { colorPicker.draw(); }, colorPicker.drawInterval);
+	}else{
+		this.drawID = false;
+	}
 
 	//if the mouse is down, check whether it is on any of the handles
 	canvas.addEventListener('mousedown', function(e) {
