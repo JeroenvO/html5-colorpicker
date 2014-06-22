@@ -33,7 +33,7 @@ the [name] is used to call any of the functions after creation
 to set options after creating the colorpicker use these functions.
 * [name].setColorHSV(h,s,v)	->to set the color to a hsv value
 	
-to retrieve values at any moment use
+to retrieve values at any moment use. All values are floats between 0 to 1
 * [name].getColorHSV() to get the color in HSV
 * [name].getColorHSL() to get the color in HSL (for use in CSS colors)
 

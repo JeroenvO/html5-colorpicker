@@ -150,33 +150,35 @@ function hsv2hsl(hue,sat,val){
 colorPicker.prototype.setWidth = function(w,h,centerX,centerY,scale){
 	this.canvas.width =w;
 	this.canvas.heigth = h;
+	this.ctx.canvas.width=w;
+	this.ctx.canvas.height=h;
 	this.centerX = centerX || w/2;
 	this.centerY = centerY || h/2;
 	this.scale = scale || Math.min(w,h)/10; //size of one arc. 40 (=40px) is the same as alarms app one alarm view.
 	this.changed = true;
 }
-//return the chosen color as HSV
+//return the chosen color as HSV with values 0-1
 colorPicker.prototype.getColorHSV = function(){
 	return {
-		h : this.h,
+		h : this.h/(2*Math.PI),
 		s : this.s,
 		v : this.v
 	}
 }
-//return the chosen color as HSL
+//return the chosen color as HSL with values 0-1
 colorPicker.prototype.getColorHSL = function(){
 	hsl = hsv2hsl(this.h,this.s,this.v)
 	return {
-		h : hsl.h,
+		h : hsl.h/(2*Math.PI),
 		s : hsl.s,
 		l : hsl.l
 	}
 }
 //set the colorPicker to a given color in hsv values
 colorPicker.prototype.setColorHSV = function(h, s, v){
-	this.h = h<2*Math.PI?h:0;
-	this.s = (s<100?s:0)/100;
-	this.v = (v<100?v:0)/100;
+	this.h = h<=1?h*(2*Math.PI):0;
+	this.s = (s<=1?s:0);
+	this.v = (v<=1?v:0);
 	this.changed = true;
 }
 //start the timer for drawing
@@ -205,8 +207,8 @@ function colorPicker(canvas,opts){
 	this.clrImg.src = opts.image||'color-500.png';                        //store (this) class in variable, so events can use (this) as well
 	//default values, all zero
 	this.h = 0;  //0-2pi
-	this.s = 0;  //0-100
-	this.v = 0;  //0-100
+	this.s = 0;  //0-1
+	this.v = 0;  //0-1
 	this.changed = true;
 	this.bgcolor = opts.bgcolor||'rgb(200,200,200)';
 	//options
@@ -220,7 +222,7 @@ function colorPicker(canvas,opts){
 	this.setColorHSV(opts.h, opts.s, opts.v);
 	
 	//start the drawing
-	if((typeof opts.autoStartDraw === 'undefined')||opts.autoStartDraw==true;){
+	if((typeof opts.autoStartDraw === 'undefined')||opts.autoStartDraw==true){
 		this.drawID = setInterval(function() { colorPicker.draw(); }, colorPicker.drawInterval);
 	}else{
 		this.drawID = false;
@@ -274,7 +276,7 @@ function colorPicker(canvas,opts){
 			angle+=my<0?2*Math.PI:0;
 			if(colorPicker.selected=='c'){
 				colorPicker.h = angle;
-				console.log("a:"+angle);
+				//console.log("a:"+angle);
 				var s = (Math.sqrt(Math.pow(mx,2)+Math.pow(my,2))-colorPicker.scale)/3/colorPicker.scale;
 				s= s>1?1:s;
 				s = s<0?0:s;
