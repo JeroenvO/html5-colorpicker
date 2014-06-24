@@ -9,7 +9,7 @@ Uses HTML5, javascript but not Jquery. Can easily be used as plugin.
 
 Look at the colorpicker-demo.html file for examples
 
-demo will soon be online
+demo: http://raspberry.vanoorschot.biz/code/colorpicker/colorpicker-demo.html
 
 use as 
 ```js
