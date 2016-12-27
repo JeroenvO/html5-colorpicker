@@ -11,7 +11,7 @@ Look at the colorpicker-demo.html file for examples
 
 Demo on https://jjvanoorschot.nl/scriptsweb/20140520HTML5%20canvas%20colorpicker/colorpicker-demo.html
 
-use as 
+use as
 ```js
 [name] = new colorPicker( [canvas to bind to] , [ options ] )
 ```
@@ -34,10 +34,11 @@ Options should be provided in key-value pairs.
 * onCenterClick 	 -> callback on clicking on the center
 to set options after creating the colorpicker use these functions.
 * [name].setColorHSV(h,s,v)	->to set the color to a hsv value
-	
+
 to retrieve values at any moment use. All values are floats between 0 to 1
 * [name].getColorHSV() to get the color in HSV
 * [name].getColorHSL() to get the color in HSL (for use in CSS colors)
+* [name].getColorRGB() to get the color in RGB (integers between 0-255)
 
 ## Example ##
 ```html
@@ -58,7 +59,7 @@ colorPicker1 = new colorPicker(document.getElementById('colorPicker1'), {
 ```
 
 ## jQuery ##
-To use this with jQuery, use the jquery wrapper plugin 'jquery-colorpicker.js' and also include the original file 'colorPicker.js'.
+To use this with jQuery, use the jquery wrapper plugin 'jquery.colorpicker.js' and also include the original file 'colorPicker.js'.
 See colorpicker-jquery-demo.html for example
 
 use selector.data('tp') to access the colorPicker javascript functions:

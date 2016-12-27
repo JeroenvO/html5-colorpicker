@@ -183,6 +183,9 @@ colorPicker.prototype.setWidth = function(w,h,centerX,centerY,scale){
 }
 //return the chosen color as HSV with values 0-1
 colorPicker.prototype.getColorHSV = function(){
+	if(this.nov){
+		this.v = 1
+	}
 	return {
 		h : this.h/(2*Math.PI),
 		s : this.s,
@@ -191,7 +194,7 @@ colorPicker.prototype.getColorHSV = function(){
 }
 //return the chosen color as HSL with values 0-1
 colorPicker.prototype.getColorHSL = function(){
-		if(this.nov){
+	if(this.nov){
 		this.v = 1
 	}
 	hsl = hsv2hsl(this.h,this.s,this.v)
@@ -203,6 +206,9 @@ colorPicker.prototype.getColorHSL = function(){
 }
 
 colorPicker.prototype.getColorRGB = function(){
+	if(this.nov){
+		this.v = 1
+	}
 	return hsv2rgb(this.h, this.s, this.v);
 }
 
