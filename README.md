@@ -5,19 +5,20 @@ HTML5 canvas colorpicker, works in all modern browsers. Easily choose a color in
 
 Works in all modern browsers that support html5 canvas
 
-Uses HTML5, javascript but not Jquery. Can easily be used as plugin.
+Uses HTML5 and plain javascript. Can easily be used as plugin in javascript or with Jquery.
 
 Look at the colorpicker-demo.html file for examples
 
-demo: http://raspberry.vanoorschot.biz/code/colorpicker/colorpicker-demo.html
+Demo on https://jjvanoorschot.nl/scriptsweb/20140520HTML5%20canvas%20colorpicker/colorpicker-demo.html
 
 use as 
 ```js
 [name] = new colorPicker( [canvas to bind to] , [ options ] )
 ```
-the [name] is used to call any of the functions after creation
+the [name] object is used to call any of the functions after creation
 
 ## options ##
+Options should be provided in key-value pairs.
 * h		 	 -> initial color hue
 * s		 	 -> initial color saturation
 * v  	 	 -> initial color value
@@ -37,6 +38,23 @@ to retrieve values at any moment use. All values are floats between 0 to 1
 * [name].getColorHSV() to get the color in HSV
 * [name].getColorHSL() to get the color in HSL (for use in CSS colors)
 
+## Example ##
+```html
+<canvas width="500" height="500" id="colorPicker1"></canvas>
+```
+and
+```js
+colorPicker1 = new colorPicker(document.getElementById('colorPicker1'), {
+	bgcolor: 'rgba(50,50,50,0)',
+	onColorChange: function(){
+		var color = this.getColorHSV();
+		document.getElementById('colorPickerValue').innerHTML = "Color h:"+color.h+" s: "+ color.s+" v: "+ color.v;
+		},
+	onCenterClick: function(){
+		window.alert('You clicked the center!');
+		}
+});
+```
 
 ## jQuery ##
 To use this with jQuery, use the jquery wrapper plugin 'jquery-colorpicker.js' and also include the original file 'colorPicker.js'.

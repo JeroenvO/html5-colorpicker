@@ -40,18 +40,19 @@ colorPicker.prototype.draw = function(drawHandles){
 		
 		//background for value ring
 		//get color for display in css, hsv to hsl. value is constant 100%, 	
-		hsl = hsv2hsl(this.h/Math.PI*180,this.s*100,100);
-		hsl = 'hsl('+hsl.h+','+hsl.s+'%,'+hsl.l+'%)';
-		
-		//draw the arc as very thick lines
-		this.ctx.lineWidth = this.scale; 
-		
-		//draw outer circle for value ring
-		this.ctx.beginPath();
-		this.ctx.strokeStyle = hsl;
-		this.ctx.arc(0,0, this.scale*4+this.scale/2, 0, 2*Math.PI, false);
-		this.ctx.stroke();
-		this.ctx.closePath();
+		if(!this.nov){
+			hsl = hsv2hsl(this.h/Math.PI*180,this.s*100,100);
+			hsl = 'hsl('+hsl.h+','+hsl.s+'%,'+hsl.l+'%)';
+			//draw the arc as very thick lines
+			this.ctx.lineWidth = this.scale; 
+			
+			//draw outer circle for value ring
+			this.ctx.beginPath();
+			this.ctx.strokeStyle = hsl;
+			this.ctx.arc(0,0, this.scale*4+this.scale/2, 0, 2*Math.PI, false);
+			this.ctx.stroke();
+			this.ctx.closePath();
+		}
 		
 		//draw colorgradient
 		this.ctx.drawImage(this.clrImg, -this.scale*5, -this.scale*5, this.scale*10, this.scale*10);
@@ -76,9 +77,11 @@ colorPicker.prototype.draw = function(drawHandles){
 		//set canvas origin
 		this.ctx.restore(); //restore the canvas so that origin is in center of image
 		//value handle
-		this.ctx.rotate(this.v*2*Math.PI);
-		this.ctx.translate(this.scale*4.5,0); //go to handle location
-		this.drawHandle('v');
+		if(!this.nov){
+			this.ctx.rotate(this.v*2*Math.PI);
+			this.ctx.translate(this.scale*4.5,0); //go to handle location
+			this.drawHandle('v');
+		}
 		this.ctx.restore();
 	}
 	this.changed = false;
@@ -124,9 +127,9 @@ colorPicker.prototype.getHandlers = function(){
 //used for checked whether handle is selected
 colorPicker.prototype.contains = function(xMouse, yMouse){
 	handlersPos = this.getHandlers();
-	if((Math.pow(handlersPos.xv-xMouse,2)+Math.pow(handlersPos.yv-yMouse,2))  <= this.scale/2*this.scale/2 )
+	if(!this.nov && (Math.pow(handlersPos.xv-xMouse,2)+Math.pow(handlersPos.yv-yMouse,2))  <= this.scale/2*this.scale/2 )
 		{return 'v'; }
-	if((Math.pow(handlersPos.xc-xMouse,2)+Math.pow(handlersPos.yc-yMouse,2)) <= this.scale/2*this.scale/2 )
+	else if((Math.pow(handlersPos.xc-xMouse,2)+Math.pow(handlersPos.yc-yMouse,2)) <= this.scale/2*this.scale/2 )
 		{return 'c'; }
 	else
 		return false;
@@ -167,6 +170,9 @@ colorPicker.prototype.getColorHSV = function(){
 }
 //return the chosen color as HSL with values 0-1
 colorPicker.prototype.getColorHSL = function(){
+		if(this.nov){
+		this.v = 1
+	}
 	hsl = hsv2hsl(this.h,this.s,this.v)
 	return {
 		h : hsl.h/(2*Math.PI),
@@ -179,6 +185,9 @@ colorPicker.prototype.setColorHSV = function(h, s, v){
 	this.h = h<=1?h*(2*Math.PI):0;
 	this.s = (s<=1?s:0);
 	this.v = (v<=1?v:0);
+		if(this.nov){
+		this.v = 1
+	}
 	this.changed = true;
 }
 //start the timer for drawing
@@ -200,11 +209,16 @@ colorPicker.prototype.stopDraw = function(){
 function colorPicker(canvas,opts){
 	//init
 	this.canvas = canvas;
-	this.ctx = canvas.getContext('2d');            //get the drawable part of the canvas
-	var colorPicker = this; 
+	this.ctx = canvas.getContext('2d');             //get the drawable part of the canvas
+	var colorPicker = this; 						//store (this) class in variable, so events can use (this) as well
+	this.nov = opts.nov||false 						//nov = no value; set to true to disable the outer (value) ring
 	//image for the gradient in the center
 	this.clrImg = new Image();
-	this.clrImg.src = opts.image||'color-500.png';                        //store (this) class in variable, so events can use (this) as well
+	if(this.nov){
+		this.clrImg.src = opts.image||'color-nov-500.png';  
+	}else{
+		this.clrImg.src = opts.image||'color-500.png';  
+	}
 	//default values, all zero
 	this.h = 0;  //0-2pi
 	this.s = 0;  //0-1
@@ -213,7 +227,6 @@ function colorPicker(canvas,opts){
 	this.bgcolor = opts.bgcolor||'rgb(200,200,200)';
 	//options
 	this.setWidth(canvas.width,canvas.height,opts.centerX || false, opts.centerY || false, opts.scale || false);
-	//this.drawHandles = (typeof opts.drawHandles === 'undefined' || opts.drawHandles == true)?true:false; //draw handles on the colorPicker. If false, it is just a clock	
 
 //	this.animationStep = opts.animationStep || 5; 	//number of steps in handle animation
 	this.drawInterval = opts.drawInterval || 10;	//time between drawing the canvas in ms
@@ -236,7 +249,7 @@ function colorPicker(canvas,opts){
 			
 			colorPicker.selected = colorPicker.contains(mouse.x,mouse.y); //this functions sets colorPicker.selected
 			
-			if(!colorPicker.selected){ //if not clicked on a ring, move the ring to a position\
+			if(!colorPicker.selected){ //if not clicked on a ring, move the ring to a position
 				var mx = mouse.x-colorPicker.centerX;
 				var my = mouse.y-colorPicker.centerY;
 				var len = Math.pow(mx,2)+Math.pow(my,2);
@@ -252,7 +265,7 @@ function colorPicker(canvas,opts){
 							colorPicker.selected = 'c';
 							if(colorPicker.onColorChange){colorPicker.onColorChange();} //function executed when the handles are changed
 						}
-						else{ //inside value ring
+						else if(!colorPicker.nov){ //inside value ring
 							colorPicker.v = (angle/(2*Math.PI))%1;
 							colorPicker.selected = 'v';
 							if(colorPicker.onColorChange){colorPicker.onColorChange();} //function executed when the handles are changed
@@ -263,7 +276,7 @@ function colorPicker(canvas,opts){
 			colorPicker.changed = true; //redraw to show selected handle on click, not only on draw
 		}
 	});
-	//if the mouse if moved AND a handler is selected, move the handler and calculate the new time
+	//if the mouse if moved AND a handler is selected, move the handler and calculate the new color
 	canvas.addEventListener('mousemove', function(e) {
 		if(colorPicker.selected && document.body.contains(colorPicker.canvas)){
 			if(colorPicker.onColorChange){colorPicker.onColorChange();} //function executed when the handles are changed
@@ -282,7 +295,7 @@ function colorPicker(canvas,opts){
 				s = s<0?0:s;
 				colorPicker.s = s;
 			}
-			else if(colorPicker.selected == 'v'){
+			else if(colorPicker.selected == 'v' && !colorPicker.nov){
 				colorPicker.v = (angle/(2*Math.PI))%1;
 			}
 			//the canvas changed, if this is true, it will be redrawn
