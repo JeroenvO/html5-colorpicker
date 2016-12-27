@@ -27,6 +27,7 @@ Options should be provided in key-value pairs.
 * drawInterval	   -> number of milliseconds between drawing. default is 10ms = 100hz. The real speed depends on the browser and computer.
 * scale			 -> set the scale of the colorpicker. This is the number of pixels the arc for value is thick. When not set, it adapts to the canvas size: scale = min(w,h) / 10.
 * autoStartDraw	->Start the drawing timer when the colorpicker is made, this is default. Set it to false if the colorpicker is hidden, and then start the drawing manually with colorpicker.startDraw(). This way the colorpicker doesn't use CPU when it is not visible.
+* nov		-> No-value; Set to true to not draw the value ring. Only use HS and not V. V is set to the constant value of 1.
 
 ## functions ##
 * onColorChange 	 -> callback on dragging the handles
