@@ -34,18 +34,18 @@ colorPicker.prototype.draw = function(drawHandles){
 		this.ctx.closePath();
 		this.ctx.fillStyle = this.bgcolor; //background color
 		this.ctx.fill();
-		
+
 		//draw around center
 		this.ctx.translate(this.centerX, this.centerY);
-		
+
 		//background for value ring
-		//get color for display in css, hsv to hsl. value is constant 100%, 	
+		//get color for display in css, hsv to hsl. value is constant 100%,
 		if(!this.nov){
 			hsl = hsv2hsl(this.h/Math.PI*180,this.s*100,100);
 			hsl = 'hsl('+hsl.h+','+hsl.s+'%,'+hsl.l+'%)';
 			//draw the arc as very thick lines
-			this.ctx.lineWidth = this.scale; 
-			
+			this.ctx.lineWidth = this.scale;
+
 			//draw outer circle for value ring
 			this.ctx.beginPath();
 			this.ctx.strokeStyle = hsl;
@@ -53,21 +53,21 @@ colorPicker.prototype.draw = function(drawHandles){
 			this.ctx.stroke();
 			this.ctx.closePath();
 		}
-		
+
 		//draw colorgradient
 		this.ctx.drawImage(this.clrImg, -this.scale*5, -this.scale*5, this.scale*10, this.scale*10);
-		
+
 		//get color for center
 		hsl = hsv2hsl(this.h/Math.PI*180,this.s*100,this.v*100);
 		hsl = 'hsl('+hsl.h+','+hsl.s+'%,'+hsl.l+'%)';
-		
+
 		//draw inside, chosen color
 		this.ctx.beginPath();
 		this.ctx.arc(0,0, this.scale*1, 0, 2*Math.PI, false);
 		this.ctx.closePath();
 		this.ctx.fillStyle = hsl;
 		this.ctx.fill();
-	
+
 		//draw the handles
 		this.ctx.save();
 		//color handle
@@ -95,7 +95,7 @@ colorPicker.prototype.drawHandle =  function(handle){
 	//this.ctx.strokeStyle='white'
 	this.ctx.arc(0,0, this.scale/2-lw/2, 0, 2*Math.PI, false);
 	this.ctx.closePath();
-	
+
 	this.ctx.fillStyle = 'rgba(0,0,0,0)';//color inside handle
 	this.ctx.strokeStyle = (this.selected===handle)?'rgba(220,220,220,0.7)':'rgba(255,255,255,1)';  //color of ring, first: when selected, second: other
 	this.ctx.stroke();
@@ -118,7 +118,7 @@ colorPicker.prototype.getHandlers = function(){
 	*/
 	return {
 		xv : this.centerX+Math.cos(this.v * 2*Math.PI)*(this.scale*4.5),
-		yv : this.centerY+Math.sin(this.v * 2*Math.PI)*(this.scale*4.5), 
+		yv : this.centerY+Math.sin(this.v * 2*Math.PI)*(this.scale*4.5),
 		xc : this.centerX+Math.cos(this.h)*(this.scale*3*this.s+this.scale),
 		yc : this.centerY+Math.sin(this.h)*(this.scale*3*this.s+this.scale)
 	};
@@ -135,7 +135,7 @@ colorPicker.prototype.contains = function(xMouse, yMouse){
 		return false;
 }
 //convert hsv to hsl
-function hsv2hsl(hue,sat,val){
+var hsv2hsl = function(hue,sat,val){
     // determine the lightness in the range [0,100]
     var l = (2 - sat / 100) * val / 2;
 
@@ -148,6 +148,27 @@ function hsv2hsl(hue,sat,val){
     // correct a division-by-zero error
     if (isNaN(hsl.s)) hsl.s = 0;
 	return hsl;
+}
+
+var hsv2rgb = function(h,s,v) {
+	var r, g, b;
+
+	var i = Math.floor(h * 6);
+	var f = h * 6 - i;
+	var p = v * (1 - s);
+	var q = v * (1 - f * s);
+	var t = v * (1 - (1 - f) * s);
+
+	switch(i % 6){
+		case 0: r = v, g = t, b = p; break;
+		case 1: r = q, g = v, b = p; break;
+		case 2: r = p, g = v, b = t; break;
+		case 3: r = p, g = q, b = v; break;
+		case 4: r = t, g = p, b = v; break;
+		case 5: r = v, g = p, b = q; break;
+	}
+
+	return {'r':Math.round(r * 255), 'g':Math.round(g * 255), 'b':Math.round(b * 255)};
 }
 //set the width of the canvas
 colorPicker.prototype.setWidth = function(w,h,centerX,centerY,scale){
@@ -180,6 +201,11 @@ colorPicker.prototype.getColorHSL = function(){
 		l : hsl.l
 	}
 }
+
+colorPicker.prototype.getColorRGB = function(){
+	return hsv2rgb(this.h, this.s, this.v);
+}
+
 //set the colorPicker to a given color in hsv values
 colorPicker.prototype.setColorHSV = function(h, s, v){
 	this.h = h<=1?h*(2*Math.PI):0;
@@ -215,9 +241,9 @@ function colorPicker(canvas,opts){
 	//image for the gradient in the center
 	this.clrImg = new Image();
 	if(this.nov){
-		this.clrImg.src = opts.image||'color-nov-500.png';  
+		this.clrImg.src = opts.image||'color-nov-500.png';
 	}else{
-		this.clrImg.src = opts.image||'color-500.png';  
+		this.clrImg.src = opts.image||'color-500.png';
 	}
 	//default values, all zero
 	this.h = 0;  //0-2pi
@@ -233,7 +259,7 @@ function colorPicker(canvas,opts){
 	this.onColorChange = opts.onColorChange || false; //callback function
 	this.onCenterClick = opts.onCenterClick || false;
 	this.setColorHSV(opts.h, opts.s, opts.v);
-	
+
 	//start the drawing
 	if((typeof opts.autoStartDraw === 'undefined')||opts.autoStartDraw==true){
 		this.drawID = setInterval(function() { colorPicker.draw(); }, colorPicker.drawInterval);
@@ -246,9 +272,9 @@ function colorPicker(canvas,opts){
 		//console.log(e);
 		if(document.body.contains(colorPicker.canvas)){ //only if canvas is visible
 			var mouse = colorPicker.getMousePos(e);
-			
+
 			colorPicker.selected = colorPicker.contains(mouse.x,mouse.y); //this functions sets colorPicker.selected
-			
+
 			if(!colorPicker.selected){ //if not clicked on a ring, move the ring to a position
 				var mx = mouse.x-colorPicker.centerX;
 				var my = mouse.y-colorPicker.centerY;
@@ -270,7 +296,7 @@ function colorPicker(canvas,opts){
 							colorPicker.selected = 'v';
 							if(colorPicker.onColorChange){colorPicker.onColorChange();} //function executed when the handles are changed
 						}
-					}					
+					}
 				}
 			}
 			colorPicker.changed = true; //redraw to show selected handle on click, not only on draw
@@ -304,7 +330,7 @@ function colorPicker(canvas,opts){
 	});
 	//stop the selection when the mouse is released.
 	//bind this one to window to also stop the selection if mouse is released outside the canvas area.
-	window.addEventListener('mouseup', function(e) { 
+	window.addEventListener('mouseup', function(e) {
 		if(colorPicker.selected && document.body.contains(colorPicker.canvas)){
 			//colorPicker.animate(colorPicker.selected,true); //animate handlers to position
 			colorPicker.selected = false; // which handle is moving is now stored, so handle can be deselected
